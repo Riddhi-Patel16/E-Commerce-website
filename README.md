@@ -1,4 +1,4 @@
-# Clothing E-Commerce Website
+# E-Commerce Website
 
 This is a full-featured e-commerce website for clothing, built using the MERN stack (MongoDB, Express.js, React, and Node.js).
 
