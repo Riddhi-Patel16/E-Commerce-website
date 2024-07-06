@@ -1,7 +1,7 @@
 .shopcategory-banner{
     display: block;
     margin: 30px auto;
-    width: 85%;
+    width: 80%;
 }
 .shopcategory-indexsort{
     display:flex;
@@ -27,7 +27,7 @@
     display:grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
     row-gap: 50px;
-    column-gap: 20px;
+    column-gap: 30px;
 }
 .shopcategory-loadmore{
     display: flex;
