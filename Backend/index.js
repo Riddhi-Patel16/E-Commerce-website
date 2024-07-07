@@ -5,13 +5,12 @@ import multer from 'multer';
 import path from 'path';
 import cors from 'cors'
 import dotenv from 'dotenv';
+import { log } from 'console';
 
 dotenv.config();
 const port = process.env.PORT || 4000;
 let app=express();
-app.use(express.urlencoded({
-    extended:false
-}));
+app.use(express.json());
 app.use(cors());
 
 mongoose.connect(process.env.MONGODB_URI).then(() => {
@@ -67,17 +66,15 @@ const Product=mongoose.model("Product",{
 
 app.post('/addproduct',async(req,res)=>{
     let products=await Product.find({});
-    let id;
+    let id2=1;
     if(products.length>0)
     {
-        let last_product_object=products.slice(-1);
-        let last_id=last_product_object[0];
-        id=last_id+1;
+        let last_product_object=products.slice(-1)[0];
+        let last_id=last_product_object.id;
+        id2=last_id+1;
     }
-    else
-    id=1;
     const product=new Product({
-        id:id,
+        id:id2,
         name:req.body.name,
         image:req.body.image,
         category:req.body.category,
