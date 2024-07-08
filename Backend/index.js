@@ -170,6 +170,59 @@ app.post('/login',async(req,res)=>{
     }
 })
 
+app.get('/newcollection',async(req,res)=>{
+    let products=await Product.find({});
+    let newcollection=products.slice(0).slice(-8);
+    console.log("newcollection fetched");
+    res.send(newcollection);
+})
+
+app.get('/popularinwomen',async(req,res)=>{
+    let products=await Product.find({category:"women"});
+    let popularinwomen=products.slice(0,4);
+    console.log("popular in women fetched");
+    res.send(popularinwomen);
+})
+
+// middleware to fetch user from token
+const fetchuser=async(req,res,next)=>{
+    const token=req.header('auth-token');
+    console.log(token);
+    if(!token)
+        res.status(401).send({errors:"Please Authenticate using valid token"})
+    else
+    {
+        try{
+            const data=jwt.verify(token,process.env.JWT_SECRET);
+            req.user=data.user;
+            next();
+        }catch(error)
+        {
+            res.status(401).send({errors:"Please Authenticate using valid token"});
+        }
+    }
+}
+app.post('/addtocart',fetchuser,async(req,res)=>{
+    
+    let userData=await Users.findOne({_id:req.user.id});
+    userData.cartData[req.body.itemid]+=1;
+    await Users.findOneAndUpdate({_id:req.user.id},{cartData:userData.cartData});
+    res.json({ message: "Added" });
+})
+app.post('/removefromcart',fetchuser,async(req,res)=>{
+    let userData=await Users.findOne({_id:req.user.id});
+    if(userData.cartData[req.body.itemid]>0)
+    userData.cartData[req.body.itemid]-=1;
+    await Users.findOneAndUpdate({_id:req.user.id},{cartData:userData.cartData});
+    res.json({ message: "removed" });
+})
+app.post('/getcart',fetchuser,async(req,res)=>{
+   let userdata=await Users.findOne({_id:req.user.id});
+   res.json(userdata.cartData);
+})
+
+
+
 
 app.post('/removeproduct',async(req,res)=>{
     await Product.findOneAndDelete({id:req.body.id});
