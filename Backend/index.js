@@ -6,6 +6,7 @@ import path from 'path';
 import cors from 'cors'
 import dotenv from 'dotenv';
 import { log } from 'console';
+import { type } from 'os';
 
 dotenv.config();
 const port = process.env.PORT || 4000;
@@ -89,6 +90,86 @@ app.post('/addproduct',async(req,res)=>{
         name:req.body.name,
     })
 })
+
+
+const Users=mongoose.model('Users',{
+    name:{
+        type:String,
+    },
+    email:{
+        type:String,
+        unique:true,
+    },
+    password:{
+        type:String
+    },
+    cartData:{
+        type:Object,
+    },
+    Date:{
+        type:Date,
+        Default:Date.now,
+    }
+})
+
+
+app.post('/signup',async(req,res)=>{
+    let check=await Users.findOne({email:req.body.email});
+    if(check){
+        return res.status(400).json({success:false,error:"Existing use found with same email id"})
+    }
+    let cart={};
+    for (let i = 0; i < 300; i++) {
+        cart[i]=0;
+    }
+    const user=new Users({
+        name:req.body.username,
+        email:req.body.email,
+        password:req.body.password,
+        cartData:cart
+    })
+    await user.save();
+
+    const data={
+        user:{
+            id:user.id
+        }
+    }
+    const token=jwt.sign(data,process.env.JWT_SECRET);
+    res.json({success:true,
+        token:token
+    })
+})
+
+app.post('/login',async(req,res)=>{
+    let user=await Users.findOne({email:req.body.email});
+    if(user)
+    {
+        const passcompare=req.body.password===user.password;
+        if(passcompare)
+        {
+            const data={
+                user:{
+                    id:user.id
+                }
+            }
+            const token=jwt.sign(data,process.env.JWT_SECRET);
+            res.json({
+                success:true,
+                token:token
+            })
+        }
+        else
+        {
+            res.json({success:false,error:"Wrong Password"});
+        }
+    }
+    else
+    {
+        res.json({success:false,errors:"Wrong Email id"});
+    }
+})
+
 
 app.post('/removeproduct',async(req,res)=>{
     await Product.findOneAndDelete({id:req.body.id});
