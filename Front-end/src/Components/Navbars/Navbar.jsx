@@ -28,7 +28,8 @@ function Navbar()
                 <li onClick={()=>{setmenu("kids")}}><Link style={{textDecoration:'none',color: '#515151'}}to='/kids'>Kids</Link>{menu==="kids"&&<hr/>}</li>
             </ul>
                 <div className="nav-login-cart">
-                   <Link style={{textDecoration:'none',color: '#515151'}}to='/login'> <button>Login</button></Link>
+                    {localStorage.getItem('auth-token')?<button onClick={()=>{localStorage.removeItem('auth-token');window.location.replace('/')}}>Logout</button>:<Link style={{textDecoration:'none',color: '#515151'}}to='/login'> <button>Login</button></Link>}
+                   
                     <Link style={{textDecoration:'none',color: '#515151'}}to='/cart'><img src={cart} alt="cart" /></Link>
                     <div className="nav-cart-count">{gettotalcartitem()}</div>
                 </div>
